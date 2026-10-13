@@ -29,6 +29,76 @@ A Model Context Protocol (MCP) server that provides full email management for Ya
 - **Docker Support**: Containerized deployment with Docker and Docker Compose
 - **Cloud Ready**: Configured for easy deployment to Render.com with OAuth security
 
+## Docker uses guide
+
+First run this command to run the docker image.
+
+```sh
+docker run --rm -d \
+  --name yahoo-mail-mcp-server \
+  -p 9246:3000 \
+  -e TRANSPORT_MODE=sse \
+  -e PORT=3000 \
+  -e YAHOO_EMAIL="your.email@yahoo.com" \
+  -e YAHOO_APP_PASSWORD="your-app-password" \
+  -e OAUTH_CLIENT_ID="your-client-id" \
+  -e OAUTH_CLIENT_SECRET="your-client-secret" \
+  4msar/yahoo-mail-mcp-server:latest
+```
+
+Fill the env variables with your credentials, Then add this in your claude config.
+
+if you already have running the docker container use this command:
+
+```
+{
+  "mcpServers": {
+    "yahoo-mail": {
+      "command": "docker",
+      "args": [
+        "exec",
+        "-i",
+        "-e",
+        "TRANSPORT_MODE=stdio",
+        "yahoo-mail-mcp-server",
+        "node",
+        "server.js"
+      ]
+    }
+  }
+}
+```
+
+OR use this one
+
+```json
+{
+  "mcpServers": {
+    "yahoo-mail": {
+      "command": "docker",
+      "args": [
+        "run",
+        "-i",
+        "--rm",
+        "-e",
+        "TRANSPORT_MODE=stdio",
+        "-e",
+        "YAHOO_EMAIL=",
+        "-e",
+        "YAHOO_APP_PASSWORD=",
+        "-e",
+        "OAUTH_CLIENT_ID=0c022fe05b3a23bde793a5c6a01aa4c0",
+        "-e",
+        "OAUTH_CLIENT_SECRET=4c9205410d955ab958817f9535b8f5dd32456dbaa1ce22b2eb9c0417088a23a2",
+        "4msar/yahoo-mail-mcp-server:latest"
+      ]
+    }
+  }
+}
+```
+
+
+
 ## Prerequisites
 
 ### For Local Development
