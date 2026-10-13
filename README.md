@@ -46,6 +46,11 @@ docker run --rm -d \
   4msar/yahoo-mail-mcp-server:latest
 ```
 
+The latest build is built top of sse mode.
+
+For stdio image run this: `docker run --rm --name yahoo-mail-mcp-server -i 4msar/yahoo-mail-mcp-server:stdio`
+For sse image run this: `docker run --rm --name yahoo-mail-mcp-server -i -p 9246:3000 4msar/yahoo-mail-mcp-server:sse`
+
 Fill the env variables with your credentials, Then add this in your claude config.
 
 if you already have running the docker container use this command:
@@ -81,22 +86,61 @@ OR use this one
         "-i",
         "--rm",
         "-e",
-        "TRANSPORT_MODE=stdio",
+        "YAHOO_EMAIL=your_username@yahoo.com",
         "-e",
-        "YAHOO_EMAIL=",
-        "-e",
-        "YAHOO_APP_PASSWORD=",
-        "-e",
-        "OAUTH_CLIENT_ID=0c022fe05b3a23bde793a5c6a01aa4c0",
-        "-e",
-        "OAUTH_CLIENT_SECRET=4c9205410d955ab958817f9535b8f5dd32456dbaa1ce22b2eb9c0417088a23a2",
-        "4msar/yahoo-mail-mcp-server:latest"
+        "YAHOO_APP_PASSWORD=your_password",
+        "4msar/yahoo-mail-mcp-server:stdio"
       ]
     }
   }
 }
 ```
 
+It will run the mcp always, you can use [Lazy mcp wrapper](https://github.com/sleticalboy/lazy-mcp-wrapper) if you want to run when needed.
+
+```sh
+brew tap sleticalboy/tap
+brew install lazy-mcp-wrapper
+```
+
+**`yahoo-mail.json`**
+```json
+{
+  "name": "yahoo-mail",
+  "command": "docker",
+  "args": [
+    "run",
+    "-i",
+    "--rm",
+    "-e",
+    "YAHOO_EMAIL",
+    "-e",
+    "YAHOO_APP_PASSWORD",
+    "4msar/yahoo-mail-mcp-server:stdio"
+  ],
+  "real_framing": "jsonl",
+  "idle_timeout": "15s",
+  "startup_timeout": "30s",
+  "call_timeout": "120s",
+  "log_file": "/tmp/lazy-mcp-wrapper-yahoo-mail.log"
+}
+```
+
+in mcp config:
+
+```
+{
+  "mcpServers": {
+    "yahoo-mail": {
+      "command": "/absolute/path/to/lazy-mcp-wrapper",
+      "args": [
+        "--config",
+        "/absolute/path/to/yahoo-mail.json"
+      ]
+    }
+  }
+}
+```
 
 
 ## Prerequisites
